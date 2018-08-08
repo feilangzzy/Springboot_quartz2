@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="head :: defaultHead">
+    <!--<title>添加任务</title>-->
+    <!--<meta name="decorator" content="/WEB-INF/views/layouts/default.jsp"/>-->
+</head>
+<body>
+<ul class="nav nav-tabs">
+    <li><a href="/quartz/schedule/joblist">任务列表</a></li>
+    <li><a href="/quartz/schedule/runningjoblist">运行中任务列表</a></li>
+    <li class="active"><a href="/quartz/schedule/addjobview">添加任务</a></li>
+</ul>
+
+<section id="content">
+    <div style="width:400px;" class="container panel">
+        <section class="m-b-lg">
+
+            <form id="addJobForm">
+                <div class="form-group required">
+                    <label class="control-label" for="className">任务完整类名</label>
+                    <input id="className" type="text" class="form-control"required
+                           aria-invalid="true">
+                </div>
+                <div class="form-group required">
+                    <label class="control-label" for="jobGroup">任务组名</label>
+                    <input id="jobGroup" type="text" class="form-control"required
+                           aria-invalid="true" value="DEFAULT" disabled>
+                </div>
+                <div class="form-group required">
+                    <label class="control-label" for="jobName">任务名称</label>
+                    <input id="jobName" type="text" class="form-control"required
+                           aria-invalid="true">
+                </div>
+                <div class="form-group required">
+                    <label class="control-label" for="cronExpression">cron表达式</label>
+                    <input id="cronExpression" type="text" class="form-control" required
+                           aria-invalid="true">
+                </div>
+
+                <div class="form-group">
+                    <input id="addJobBtn" type="button" class="btn btn-lg btn-primary btn-block" value="提交">
+                </div>
+            </form>
+        </section>
+        <div class="line line-dashed"></div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#addJobBtn').click(function(){
+            if($('#className').val()=="" || $('#jobName').val()=="" || $('#cronExpression').val()==""){
+                alert("请填写所有数据!");
+                return;
+            }
+            var postParams = {
+                'className': $('#className').val(),
+                'jobGroup': $('#jobGroup').val(),
+                'jobName': $('#jobName').val(),
+                'cronExpression': $('#cronExpression').val()
+            };
+            $.ajax({
+                url:'/quartz/schedule/add',
+                data:postParams,
+                type: "POST",
+                dataType:'json',
+                success:function (result) {
+                    if (!result.success) {
+                        alert("添加失败!");
+                    } else {
+                        window.location = "/quartz/schedule/joblist";
+                    }
+                },
+                error: function() {
+                    alert("系统内部错误！");
+                }
+
+            });
+
+        });
+    });
+</script>
+</body>
+</html>

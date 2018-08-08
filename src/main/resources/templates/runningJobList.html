@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="head :: defaultHead">
+    <!--<title>任务调度</title>-->
+</head>
+<body>
+<ul class="nav nav-tabs">
+    <li><a href="/quartz/schedule/joblist">任务列表</a></li>
+    <li class="active"><a href="/quartz/schedule/runningjoblist">运行中任务列表</a></li>
+    <li><a href="/quartz/schedule/addjobview">添加任务</a></li>
+</ul>
+
+<form id="searchForm" role="form" th:action="@{/quartz/schedule/joblist}" th:method="post"
+           class="form-search form-inline"></form>
+<table id="contentTable" class="table table-striped table-bordered table-condensed">
+    <thead>
+    <tr align="center">
+        <th>任务名称</th>
+        <th>任务组</th>
+        <th>任务描述</th>
+        <th>任务状态</th>
+        <th>任务调度规则</th>
+        <th>操&emsp;&emsp;&emsp;作</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr th:each="job : ${jobs}">
+            <td th:text="${job.jobName}"></td>
+            <td th:text="${job.jobGroup}"></td>
+            <td th:text="${job.desc}"></td>
+            <td th:text="${job.jobStatus}"></td>
+            <td th:text="${job.cronExpression}"></td>
+            <td colspan="4">
+                <a style="color:#0000FF" th:onclick="'stop(\''+${job.jobGroup}+'\',\''+${job.jobName}+'\');'">暂停</a>&emsp;
+                <a style="color:#0000FF" th:onclick="'resume(\''+${job.jobGroup}+'\',\''+${job.jobName}+'\');'">恢复</a>&emsp;
+                <a style="color:#0000FF" th:onclick="'startnow(\''+${job.jobGroup}+'\',\''+${job.jobName}+'\');'">立即执行一次</a>&emsp;
+                <a style="color:#0000FF" th:onclick="'deletejob(\''+${job.jobGroup}+'\',\''+${job.jobName}+'\');'">删除</a>&emsp;
+            </td>
+        </tr>
+    </tbody>
+</table>
+<script type="text/javascript">
+    function stop(jobGroup, jobName) {
+        if (confirm("确认暂停任务？")) {
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                data: {'jobGroup': jobGroup, 'jobName': jobName},
+                url: '/quartz/schedule/stop',
+                success: function (data) {
+                    alert(data.msg);
+                }
+            });
+        }
+        return page();
+    }
+    function resume(jobGroup, jobName) {
+        if (confirm("确认恢复任务？")) {
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                data: {'jobGroup': jobGroup, 'jobName': jobName},
+                url: '/quartz/schedule/resume',
+                success: function (data) {
+                    alert(data.msg);
+                }
+            });
+        }
+        return page();
+    }
+
+    function deletejob(jobGroup, jobName) {
+        if (confirm("确认删除当前任务？")) {
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                data: {'jobGroup': jobGroup, 'jobName': jobName},
+                url: '/quartz/schedule/delete',
+                success: function (data) {
+                    alert(data.msg);
+                }
+            });
+        }
+        return page();
+    }
+
+    function page() {
+        $("#searchForm").submit();
+        return false;
+    }
+</script>
+</body>
+</html>

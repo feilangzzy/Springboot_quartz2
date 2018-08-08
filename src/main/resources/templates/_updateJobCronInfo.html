@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<div th:fragment="cronModal" class="modal fade" id="assignAssetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+    <div class="modal-dialog" role="document" style="height: 500px;">
+        <div class="modal-content" style="top: 300px;height: 260px">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">修改cron表达式:</h4>
+                <input id="id1" type="hidden"/>
+            </div>
+            <div class="col-md-12 form-inline">
+                <div class="form-group">
+                    <label style="width:110px;">jobGroup</label>
+                    <input id="jobGroup" readonly="readonly" style="border: none"/>
+                </div>
+            </div>
+            <div class="col-md-12 form-inline">
+                <div class="form-group">
+                </div>
+            </div>
+            <div class="col-md-12 form-inline">
+                <div class="form-group">
+                    <label style="width:110px;">jobName</label>
+                    <input id="jobName" readonly="readonly" style="border: none"/>
+                </div>
+            </div>
+            <div class="col-md-12 form-inline">
+                <div class="form-group">
+                </div>
+            </div>
+            <div class="col-md-12 form-inline">
+                <div class="form-group">
+                    <label style="width:110px;">cronExpression</label>
+                    <input id="cronExpression"/>
+                </div>
+            </div>
+            <div class="col-md-12 form-inline">
+                <div class="form-group">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-cancle" type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary btn-execute-assign" disabled="disabled">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        $('.btn-execute-assign').click(function () {
+            var cronExpression = $("#cronExpression").val();
+            var jobName = $("#jobName").val();
+            var jobGroup = $("#jobGroup").val();
+
+            if (cronExpression == null || cronExpression == '') {
+                alert("请输入cron表达式!");
+                return false;
+            }
+
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                async: false,
+                data: {
+                    'cronExpression': cronExpression,
+                    'jobName': jobName,
+                    'jobGroup': jobGroup
+                },
+                url: '/quartz/schedule/changeCron',
+                success: function (data) {
+                    alert(data.msg);
+                }
+            }).fail(function () {
+                alert('服务器出错,请重试!');
+            });
+            return page();
+        });
+
+    });
+
+    function changeCron(jobGroup, jobName, cronExpression) {
+        $('.btn-execute-assign').removeAttr('disabled');
+        $("#assignAssetModal").modal();
+        $("#jobGroup").val(jobGroup);
+        $("#jobName").val(jobName);
+        $("#cronExpression").val(cronExpression);
+    }
+</script>
